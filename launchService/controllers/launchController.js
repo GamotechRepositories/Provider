@@ -1,5 +1,6 @@
 import { validateOperator } from "../services/operatorService.js";
 import { requireJson, getValidationInput } from "./helpers.js";
+import { buildLaunchUrl } from "../utils/buildLaunchUrl.js";
 
 const LAUNCH_PATH = "/api/v1/launch";
 
@@ -26,6 +27,7 @@ export async function launch(req, res) {
       playerId,
       gameCode: game.code,
       gameName: game.name,
+      launchUrl: buildLaunchUrl({ operator, game, playerId }),
       sessionTimeout: operator.sessionTimeout,
       currency: operator.currency,
       timezone: operator.timezone,
