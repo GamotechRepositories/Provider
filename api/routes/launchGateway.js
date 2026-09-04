@@ -1,10 +1,8 @@
 import { Router } from "express";
 import axios from "axios";
-
 const router = Router();
-
 const LAUNCH_SERVICE_URL =
-  process.env.LAUNCH_SERVICE_URL || "http://localhost:3001";
+  process.env.LAUNCH_SERVICE_URL;
 
 async function proxyToLaunchService(req, res, servicePath) {
   try {
