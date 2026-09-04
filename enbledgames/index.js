@@ -13,7 +13,7 @@ app.get("/health", (_req, res) => {
   res.json({ success: true, message: "Enabled games microservice is running" });
 });
 
-app.use("/", enabledGamesRouter);
+app.use("/api/v1", enabledGamesRouter);
 
 app.listen(PORT, () => {
   console.log(`Enabled games service running on port ${PORT}`);

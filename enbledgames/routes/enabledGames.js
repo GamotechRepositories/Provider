@@ -3,6 +3,6 @@ import { getOperatorEnabledGames } from "../controllers/enabledGamesController.j
 
 const router = Router();
 
-router.get("/operators/:operatorId/enabled-games", getOperatorEnabledGames);
+router.get("/enabled-games", getOperatorEnabledGames);
 
 export default router;

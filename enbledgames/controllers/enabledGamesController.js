@@ -1,7 +1,14 @@
 import { getEnabledGames } from "../services/enabledGamesService.js";
 
 export async function getOperatorEnabledGames(req, res) {
-  const { operatorId } = req.params;
+  const { operatorId } = req.query;
+
+  if (!operatorId) {
+    return res.status(400).json({
+      success: false,
+      message: "operatorId query parameter is required",
+    });
+  }
 
   try {
     const result = await getEnabledGames(operatorId);

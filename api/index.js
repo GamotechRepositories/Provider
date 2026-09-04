@@ -2,6 +2,7 @@ import "dotenv/config";
 import express from "express";
 import cors from "cors";
 import launchGateway from "./routes/launchGateway.js";
+import enabledGamesGateway from "./routes/enabledGamesGateway.js";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -20,6 +21,7 @@ app.get("/", (_req, res) => {
 });
 
 app.use("/api/v1", launchGateway);
+app.use("/api/v1", enabledGamesGateway);
 
 app.listen(PORT, () => {
   console.log(`API Gateway running on port ${PORT}`);
