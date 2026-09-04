@@ -28,6 +28,7 @@ export async function validateOperator({
   playerId,
   gameCode,
   currency,
+  apiSecretPath,
   apiKey,
   timestamp,
   signature,
@@ -35,11 +36,12 @@ export async function validateOperator({
   path,
   rawBody,
 }) {
-  if (!operatorId || !playerId || !gameCode || !currency) {
+  if (!operatorId || !playerId || !gameCode || !currency || !apiSecretPath) {
     return {
       valid: false,
       status: 400,
-      message: "operatorId, playerId, gameCode, and currency are required",
+      message:
+        "operatorId, playerId, gameCode, currency, and apiSecretPath are required",
     };
   }
 
@@ -102,9 +104,17 @@ export async function validateOperator({
     };
   }
 
+  if (operator.apiSecretPath !== apiSecretPath) {
+    return {
+      valid: false,
+      status: 401,
+      message: "Invalid apiSecretPath",
+    };
+  }
+
   let secret;
   try {
-    secret = await getOperatorSecret(operator.apiSecretPath);
+    secret = await getOperatorSecret(apiSecretPath);
   } catch {
     return {
       valid: false,

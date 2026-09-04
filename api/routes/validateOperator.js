@@ -13,13 +13,14 @@ router.post("/validate-operator", async (req, res) => {
     });
   }
 
-  const { operatorId, playerId, gameCode, currency } = req.body;
+  const { operatorId, playerId, gameCode, currency, apiSecretPath } = req.body;
 
   const result = await validateOperator({
     operatorId,
     playerId,
     gameCode,
     currency,
+    apiSecretPath,
     apiKey: req.headers["x-api-key"],
     timestamp: req.headers["x-timestamp"],
     signature: req.headers["x-signature"],

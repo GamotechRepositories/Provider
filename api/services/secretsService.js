@@ -5,14 +5,6 @@ import {
 
 const secretsCache = new Map();
 
-function getLocalSecrets() {
-  try {
-    return JSON.parse(process.env.SECRETS_LOCAL || "{}");
-  } catch {
-    return {};
-  }
-}
-
 function extractSecretValue(raw) {
   if (!raw) return null;
 
@@ -31,13 +23,6 @@ export async function getOperatorSecret(apiSecretPath) {
 
   if (secretsCache.has(apiSecretPath)) {
     return secretsCache.get(apiSecretPath);
-  }
-
-  const localSecrets = getLocalSecrets();
-  if (localSecrets[apiSecretPath]) {
-    const secret = localSecrets[apiSecretPath];
-    secretsCache.set(apiSecretPath, secret);
-    return secret;
   }
 
   const region = process.env.AWS_REGION || "ap-south-1";
