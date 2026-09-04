@@ -1,8 +1,7 @@
 import "dotenv/config";
 import express from "express";
 import cors from "cors";
-import launchRouter from "./routes/launch.js";
-import validateOperatorRouter from "./routes/validateOperator.js";
+import launchGateway from "./routes/launchGateway.js";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -17,12 +16,11 @@ app.use(
 );
 
 app.get("/", (_req, res) => {
-  res.json({ success: true, message: "Launch microservice is running" });
+  res.json({ success: true, message: "API Gateway is running" });
 });
 
-app.use("/api/v1", launchRouter);
-app.use("/api/v1", validateOperatorRouter);
+app.use("/api/v1", launchGateway);
 
 app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+  console.log(`API Gateway running on port ${PORT}`);
 });
