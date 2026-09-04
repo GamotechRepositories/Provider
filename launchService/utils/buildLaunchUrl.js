@@ -1,16 +1,16 @@
 export function buildLaunchUrl({ operator, game, playerId }) {
-  const baseUrl = (
-    process.env.GAME_LAUNCH_BASE_URL || "https://provider-v2of.onrender.com"
-  ).replace(/\/$/, "");
+  if (!game.launchUrl) {
+    throw new Error(`launchUrl not configured for game: ${game.code}`);
+  }
 
-  const params = new URLSearchParams({
-    operatorId: operator.operatorId,
-    playerId,
-    gameCode: game.code,
-    currency: operator.currency,
-    language: operator.language,
-    timezone: operator.timezone,
-  });
+  const url = new URL(game.launchUrl);
 
-  return `${baseUrl}/launch?${params.toString()}`;
+  url.searchParams.set("operatorId", operator.operatorId);
+  url.searchParams.set("playerId", playerId);
+  url.searchParams.set("gameCode", game.code);
+  url.searchParams.set("currency", operator.currency);
+  url.searchParams.set("language", operator.language);
+  url.searchParams.set("timezone", operator.timezone);
+
+  return url.toString();
 }

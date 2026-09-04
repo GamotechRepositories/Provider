@@ -4,6 +4,7 @@ import {
   isTimestampValid,
 } from "../utils/hmac.js";
 import { fetchOperator } from "./operatorRepository.js";
+import { fetchGameById } from "./gameRepository.js";
 import { getOperatorSecret } from "./secretsService.js";
 
 const TIMESTAMP_TOLERANCE = Number(process.env.TIMESTAMP_TOLERANCE_SECONDS || 300);
@@ -109,15 +110,50 @@ export async function validateOperator({
     return { valid: false, status: 401, message: "Invalid X-Signature" };
   }
 
-  const game = operator.enabledGames?.find(
+  const enabledGame = operator.enabledGames?.find(
     (g) => g.code === gameCode || g.slug === gameCode
   );
 
-  if (!game) {
+  if (!enabledGame) {
     return {
       valid: false,
       status: 403,
       message: `Game ${gameCode} is not enabled for this operator`,
+    };
+  }
+
+  let game;
+  try {
+    game = await fetchGameById(enabledGame._id);
+  } catch {
+    return {
+      valid: false,
+      status: 502,
+      message: "Unable to reach games API",
+    };
+  }
+
+  if (game.status !== "ACTIVE") {
+    return {
+      valid: false,
+      status: 403,
+      message: `Game is ${game.status}`,
+    };
+  }
+
+  if (game.maintenanceMode) {
+    return {
+      valid: false,
+      status: 503,
+      message: "Game is in maintenance mode",
+    };
+  }
+
+  if (!game.launchUrl) {
+    return {
+      valid: false,
+      status: 500,
+      message: "Game launchUrl is not configured",
     };
   }
 
@@ -134,7 +170,14 @@ export async function validateOperator({
       sessionTimeout: operator.sessionTimeout,
       isDemoEnabled: operator.isDemoEnabled,
     },
-    game,
+    game: {
+      _id: game._id,
+      name: game.name,
+      slug: game.slug,
+      code: game.code,
+      launchUrl: game.launchUrl,
+      demoUrl: game.demoUrl,
+    },
     playerId,
   };
 }
