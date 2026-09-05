@@ -20,6 +20,7 @@ export async function getEnabledGames(operatorId) {
           slug: game.slug,
           code: game.code,
           status: game.status,
+          thumbnail: game.thumbnail,
           launchUrl: game.launchUrl,
           demoUrl: game.demoUrl,
           maintenanceMode: game.maintenanceMode,
