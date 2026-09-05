@@ -1,4 +1,5 @@
 import { validateOperator } from "../services/operatorService.js";
+import { createSession } from "../services/sessionRepository.js";
 import { requireJson, getValidationInput } from "./helpers.js";
 import { buildLaunchUrl } from "../utils/buildLaunchUrl.js";
 
@@ -17,11 +18,38 @@ export async function launch(req, res) {
   }
 
   const { operator, game, playerId } = result;
-  const launchUrl = buildLaunchUrl({ operator, game, playerId });
+
+  let sessionData;
+  try {
+    sessionData = await createSession({
+      operatorId: operator.operatorId,
+      playerId,
+      gameCode: game.code,
+      currency: operator.currency,
+      language: operator.language,
+      timezone: operator.timezone,
+      sessionTimeout: operator.sessionTimeout,
+    });
+  } catch {
+    return res.status(500).json({
+      success: false,
+      message: "Unable to create session",
+    });
+  }
+
+  const { sessionToken, expiresAt } = sessionData;
+  const launchUrl = buildLaunchUrl({
+    operator,
+    game,
+    playerId,
+    sessionToken,
+  });
 
   return res.status(200).json({
     success: true,
     message: "Launch successful",
+    sessionToken,
+    expiresAt,
     launchUrl,
     launch: {
       operatorId: operator.operatorId,
@@ -29,6 +57,8 @@ export async function launch(req, res) {
       playerId,
       gameCode: game.code,
       gameName: game.name,
+      sessionToken,
+      expiresAt,
       launchUrl,
       sessionTimeout: operator.sessionTimeout,
       currency: operator.currency,

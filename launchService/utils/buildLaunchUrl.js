@@ -1,4 +1,4 @@
-export function buildLaunchUrl({ operator, game, playerId }) {
+export function buildLaunchUrl({ operator, game, playerId, sessionToken }) {
   if (!game.launchUrl) {
     throw new Error(`launchUrl not configured for game: ${game.code}`);
   }
@@ -11,6 +11,10 @@ export function buildLaunchUrl({ operator, game, playerId }) {
   url.searchParams.set("currency", operator.currency);
   url.searchParams.set("language", operator.language);
   url.searchParams.set("timezone", operator.timezone);
+
+  if (sessionToken) {
+    url.searchParams.set("sessionToken", sessionToken);
+  }
 
   return url.toString();
 }
