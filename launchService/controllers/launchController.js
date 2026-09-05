@@ -17,17 +17,19 @@ export async function launch(req, res) {
   }
 
   const { operator, game, playerId } = result;
+  const launchUrl = buildLaunchUrl({ operator, game, playerId });
 
   return res.status(200).json({
     success: true,
     message: "Launch successful",
+    launchUrl,
     launch: {
       operatorId: operator.operatorId,
       operatorName: operator.name,
       playerId,
       gameCode: game.code,
       gameName: game.name,
-      launchUrl: buildLaunchUrl({ operator, game, playerId }),
+      launchUrl,
       sessionTimeout: operator.sessionTimeout,
       currency: operator.currency,
       timezone: operator.timezone,
