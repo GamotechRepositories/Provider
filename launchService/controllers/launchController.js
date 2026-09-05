@@ -30,10 +30,10 @@ export async function launch(req, res) {
       timezone: operator.timezone,
       sessionTimeout: operator.sessionTimeout,
     });
-  } catch {
+  } catch (error) {
     return res.status(500).json({
       success: false,
-      message: "Unable to create session",
+      message: error.message || "Unable to create session",
     });
   }
 
