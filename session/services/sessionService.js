@@ -1,12 +1,26 @@
 import crypto from "crypto";
-
-const sessions = new Map();
+import Session from "../models/Session.js";
 
 function generateSessionToken() {
   return crypto.randomBytes(32).toString("hex");
 }
 
-export function createSession({
+function formatSession(session) {
+  return {
+    sessionToken: session.sessionToken,
+    operatorId: session.operatorId,
+    playerId: session.playerId,
+    gameCode: session.gameCode,
+    currency: session.currency,
+    language: session.language,
+    timezone: session.timezone,
+    status: session.status,
+    createdAt: session.createdAt.toISOString(),
+    expiresAt: session.expiresAt.toISOString(),
+  };
+}
+
+export async function createSession({
   operatorId,
   playerId,
   gameCode,
@@ -16,9 +30,9 @@ export function createSession({
   sessionTimeout = 3600,
 }) {
   const sessionToken = generateSessionToken();
-  const expiresAt = new Date(Date.now() + sessionTimeout * 1000).toISOString();
+  const expiresAt = new Date(Date.now() + sessionTimeout * 1000);
 
-  const session = {
+  const session = await Session.create({
     sessionToken,
     operatorId,
     playerId,
@@ -27,43 +41,45 @@ export function createSession({
     language,
     timezone,
     status: "ACTIVE",
-    createdAt: new Date().toISOString(),
     expiresAt,
-  };
+  });
 
-  sessions.set(sessionToken, session);
-
-  return session;
+  return formatSession(session);
 }
 
-export function validateSession(sessionToken) {
+export async function validateSession(sessionToken) {
   if (!sessionToken) {
     return { valid: false, status: 401, message: "sessionToken is required" };
   }
 
-  const session = sessions.get(sessionToken);
+  const session = await Session.findOne({ sessionToken });
 
   if (!session) {
     return { valid: false, status: 401, message: "Invalid session token" };
   }
 
   if (session.status !== "ACTIVE") {
-    return { valid: false, status: 403, message: `Session is ${session.status}` };
+    return {
+      valid: false,
+      status: 403,
+      message: `Session is ${session.status}`,
+    };
   }
 
-  if (new Date(session.expiresAt) <= new Date()) {
-    sessions.delete(sessionToken);
+  if (session.expiresAt <= new Date()) {
+    await Session.deleteOne({ _id: session._id });
     return { valid: false, status: 401, message: "Session expired" };
   }
 
-  return { valid: true, session };
+  return { valid: true, session: formatSession(session) };
 }
 
-export function revokeSession(sessionToken) {
-  const session = sessions.get(sessionToken);
-  if (!session) return false;
+export async function revokeSession(sessionToken) {
+  const session = await Session.findOneAndUpdate(
+    { sessionToken },
+    { status: "REVOKED" },
+    { new: true }
+  );
 
-  session.status = "REVOKED";
-  sessions.set(sessionToken, session);
-  return true;
+  return Boolean(session);
 }

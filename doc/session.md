@@ -21,4 +21,4 @@ Operator / Platform
         │
         ▼
    API Gateway → Session Service
-   Returns operatorId, playerId, gameCode, currency → Play
+   Validates token from MongoDB → Returns operatorId, playerId, gameCode → Play
