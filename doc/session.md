@@ -12,12 +12,13 @@ Operator / Platform
         │
         ▼
    Operator opens launchUrl
-   (includes sessionToken in URL)
+   (only sessionToken in URL)
         │
         ▼
    Game (Teen Patti / Ludo / Slots)
    POST /api/v1/sessions/validate
+   Body: { "sessionToken": "..." }
         │
         ▼
    API Gateway → Session Service
-   Validates token → Play
+   Returns operatorId, playerId, gameCode, currency → Play

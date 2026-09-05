@@ -38,12 +38,7 @@ export async function launch(req, res) {
   }
 
   const { sessionToken, expiresAt } = sessionData;
-  const launchUrl = buildLaunchUrl({
-    operator,
-    game,
-    playerId,
-    sessionToken,
-  });
+  const launchUrl = buildLaunchUrl({ game, sessionToken });
 
   return res.status(200).json({
     success: true,
