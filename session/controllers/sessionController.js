@@ -1,4 +1,9 @@
-import { createSession, validateSession } from "../services/sessionService.js";
+import {
+  createSession,
+  validateSession,
+  recordSessionEvent,
+  getSessionTrack,
+} from "../services/sessionService.js";
 
 export async function createSessionHandler(req, res) {
   const {
@@ -62,20 +67,83 @@ export async function validateSessionHandler(req, res) {
     return res.status(200).json({
       success: true,
       message: "Session valid",
-      session: {
-        operatorId: result.session.operatorId,
-        playerId: result.session.playerId,
-        gameCode: result.session.gameCode,
-        currency: result.session.currency,
-        language: result.session.language,
-        timezone: result.session.timezone,
-        expiresAt: result.session.expiresAt,
-      },
+      session: result.session,
     });
   } catch {
     return res.status(500).json({
       success: false,
       message: "Unable to validate session",
+    });
+  }
+}
+
+export async function sessionEventHandler(req, res) {
+  const sessionToken =
+    req.body.sessionToken ||
+    req.headers.authorization?.replace(/^Bearer\s+/i, "");
+  const { event, tableId, roundId, payload } = req.body;
+
+  if (!event) {
+    return res.status(400).json({
+      success: false,
+      message: "event is required",
+    });
+  }
+
+  try {
+    const result = await recordSessionEvent({
+      sessionToken,
+      event,
+      tableId,
+      roundId,
+      payload,
+    });
+
+    if (!result.valid) {
+      return res.status(result.status).json({
+        success: false,
+        message: result.message,
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Session updated",
+      event: result.event,
+      session: result.session,
+    });
+  } catch {
+    return res.status(500).json({
+      success: false,
+      message: "Unable to update session",
+    });
+  }
+}
+
+export async function getSessionTrackHandler(req, res) {
+  const sessionToken =
+    req.query.sessionToken ||
+    req.headers.authorization?.replace(/^Bearer\s+/i, "");
+
+  try {
+    const result = await getSessionTrack(sessionToken);
+
+    if (!result.valid) {
+      return res.status(result.status).json({
+        success: false,
+        message: result.message,
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      session: result.session,
+      events: result.events,
+    });
+  } catch {
+    return res.status(500).json({
+      success: false,
+      message: "Unable to fetch session track",
     });
   }
 }

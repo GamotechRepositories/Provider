@@ -16,8 +16,17 @@ const sessionSchema = new mongoose.Schema(
     timezone: { type: String, default: "UTC" },
     status: {
       type: String,
-      enum: ["ACTIVE", "REVOKED"],
+      enum: ["ACTIVE", "ENDED", "REVOKED"],
       default: "ACTIVE",
+    },
+    gameContext: {
+      tableId: { type: String, default: null },
+      currentRoundId: { type: String, default: null },
+    },
+    lastEventId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "SessionEvent",
+      default: null,
     },
     expiresAt: { type: Date, required: true, index: true },
   },
