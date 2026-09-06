@@ -20,6 +20,7 @@ export async function validateOperatorHandler(req, res) {
     message: "Operator validated successfully",
     operator: result.operator,
     playerId: result.playerId,
+    playerUsername: result.playerUsername,
     game: result.game,
   });
 }

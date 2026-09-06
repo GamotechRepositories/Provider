@@ -10,6 +10,7 @@ const sessionSchema = new mongoose.Schema(
     },
     operatorId: { type: String, required: true },
     playerId: { type: String, required: true },
+    playerUsername: { type: String, required: true },
     gameCode: { type: String, required: true },
     currency: { type: String, required: true },
     language: { type: String, default: "en" },

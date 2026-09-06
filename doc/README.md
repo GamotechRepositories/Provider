@@ -9,6 +9,12 @@
 | Enabled Games Service | [enabled-games.md](./enabled-games.md) | 3002 | `enbledgames/` |
 | Session Service | [session-service.md](./session-service.md) | 3004 | `session/` |
 
+## Game integration
+
+Full end-to-end guide — operator onboarding, enabled games, launch (HMAC), and game client:
+
+**[game-integration.md](./game-integration.md)**
+
 ## Platform flow
 
 ```

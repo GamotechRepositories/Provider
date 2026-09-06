@@ -6,6 +6,7 @@ const SESSION_SERVICE_URL =
 export async function createSession({
   operatorId,
   playerId,
+  playerUsername,
   gameCode,
   currency,
   language,
@@ -18,6 +19,7 @@ export async function createSession({
       {
         operatorId,
         playerId,
+        playerUsername,
         gameCode,
         currency,
         language,

@@ -47,6 +47,7 @@ Admin           →  GET  /sessions/track      (audit)
   "sessionToken": "abc123",
   "operatorId": "AAKDA-001",
   "playerId": "P1001",
+  "playerUsername": "john_doe",
   "gameCode": "TEENPATTI",
   "status": "ACTIVE",
   "gameContext": {
@@ -162,3 +163,5 @@ cd session && npm start
 6. Game sends ROUND_ENDED event
 7. Game sends SESSION_ENDED event
 ```
+
+See **[game-integration.md](./game-integration.md)** for request/response examples and a complete client implementation guide.

@@ -45,6 +45,7 @@ Body:
 {
   "operatorId": "AAKDA-001",
   "playerId": "P1001",
+  "playerUsername": "john_doe",
   "gameCode": "TEENPATTI",
   "currency": "INR"
 }
@@ -71,6 +72,7 @@ Signature = HMAC-SHA256(secret, payload) as hex
   "launch": {
     "operatorId": "AAKDA-001",
     "playerId": "P1001",
+    "playerUsername": "john_doe",
     "gameCode": "TEENPATTI",
     "gameName": "Teen Patti",
     "launchUrl": "https://www.doormart.shop/?sessionToken=abc123"
@@ -122,5 +124,5 @@ cd launchService && npm start
 ## Generate HMAC (dev)
 
 ```bash
-node launchService/scripts/generate-signature.js POST /api/v1/launch <timestamp> <secret> '{"operatorId":"AAKDA-001","playerId":"P1001","gameCode":"TEENPATTI","currency":"INR"}'
+node launchService/scripts/generate-signature.js POST /api/v1/launch <timestamp> <secret> '{"operatorId":"AAKDA-001","playerId":"P1001","playerUsername":"john_doe","gameCode":"TEENPATTI","currency":"INR"}'
 ```

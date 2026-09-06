@@ -9,6 +9,7 @@ export async function createSessionHandler(req, res) {
   const {
     operatorId,
     playerId,
+    playerUsername,
     gameCode,
     currency,
     language,
@@ -16,10 +17,11 @@ export async function createSessionHandler(req, res) {
     sessionTimeout,
   } = req.body;
 
-  if (!operatorId || !playerId || !gameCode || !currency) {
+  if (!operatorId || !playerId || !playerUsername || !gameCode || !currency) {
     return res.status(400).json({
       success: false,
-      message: "operatorId, playerId, gameCode, and currency are required",
+      message:
+        "operatorId, playerId, playerUsername, gameCode, and currency are required",
     });
   }
 
@@ -27,6 +29,7 @@ export async function createSessionHandler(req, res) {
     const session = await createSession({
       operatorId,
       playerId,
+      playerUsername,
       gameCode,
       currency,
       language,

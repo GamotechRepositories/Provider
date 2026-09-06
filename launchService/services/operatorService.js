@@ -12,6 +12,7 @@ const TIMESTAMP_TOLERANCE = Number(process.env.TIMESTAMP_TOLERANCE_SECONDS || 30
 export async function validateOperator({
   operatorId,
   playerId,
+  playerUsername,
   gameCode,
   currency,
   apiKey,
@@ -21,11 +22,12 @@ export async function validateOperator({
   path,
   rawBody,
 }) {
-  if (!operatorId || !playerId || !gameCode || !currency) {
+  if (!operatorId || !playerId || !playerUsername || !gameCode || !currency) {
     return {
       valid: false,
       status: 400,
-      message: "operatorId, playerId, gameCode, and currency are required",
+      message:
+        "operatorId, playerId, playerUsername, gameCode, and currency are required",
     };
   }
 
@@ -179,5 +181,6 @@ export async function validateOperator({
       demoUrl: game.demoUrl,
     },
     playerId,
+    playerUsername,
   };
 }

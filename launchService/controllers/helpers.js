@@ -11,11 +11,12 @@ export function requireJson(req, res) {
 }
 
 export function getValidationInput(req, path) {
-  const { operatorId, playerId, gameCode, currency } = req.body;
+  const { operatorId, playerId, playerUsername, gameCode, currency } = req.body;
 
   return {
     operatorId,
     playerId,
+    playerUsername,
     gameCode,
     currency,
     apiKey: req.headers["x-api-key"],

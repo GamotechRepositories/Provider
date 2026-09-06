@@ -17,13 +17,14 @@ export async function launch(req, res) {
     });
   }
 
-  const { operator, game, playerId } = result;
+  const { operator, game, playerId, playerUsername } = result;
 
   let sessionData;
   try {
     sessionData = await createSession({
       operatorId: operator.operatorId,
       playerId,
+      playerUsername,
       gameCode: game.code,
       currency: operator.currency,
       language: operator.language,
@@ -50,6 +51,7 @@ export async function launch(req, res) {
       operatorId: operator.operatorId,
       operatorName: operator.name,
       playerId,
+      playerUsername,
       gameCode: game.code,
       gameName: game.name,
       sessionToken,
