@@ -18,7 +18,8 @@ API Gateway (:3000)
       │
       ├──► Launch Service
       ├──► Enabled Games Service
-      └──► Session Service
+      ├──► Session Service
+      └──► Operator Adapter Service
 ```
 
 ## Routes
@@ -31,6 +32,11 @@ API Gateway (:3000)
 | POST | `/api/v1/sessions/validate` | Session Service `/api/v1/sessions/validate` |
 | POST | `/api/v1/sessions/events` | Session Service `/api/v1/sessions/events` |
 | GET | `/api/v1/sessions/track?sessionToken=` | Session Service `/api/v1/sessions/track` |
+| GET/POST/PUT/PATCH/DELETE | `/api/v1/integrations/*` | Operator Adapter integration CRUD |
+| GET/POST | `/api/v1/adapters/:operatorId/player-profile` | Operator Adapter player profile |
+| GET/POST | `/api/v1/adapters/:operatorId/balance` | Operator Adapter balance |
+| POST | `/api/v1/adapters/:operatorId/debit` | Operator Adapter debit |
+| POST | `/api/v1/adapters/:operatorId/credit` | Operator Adapter credit |
 
 ## Environment
 
@@ -39,6 +45,7 @@ PORT=3000
 LAUNCH_SERVICE_URL=http://localhost:3001
 ENABLED_GAMES_SERVICE_URL=http://localhost:3002
 SESSION_SERVICE_URL=http://localhost:3004
+OPERATOR_ADAPTER_SERVICE_URL=http://localhost:3005
 ```
 
 ## Run locally
