@@ -130,6 +130,7 @@ Secrets resolve from AWS Secrets Manager, or local dev via `env:MY_SECRET_VAR`.
 ```env
 PORT=3005
 MONGO_URI=mongodb://localhost:27017/operatorAdapter
+CORS_ORIGIN=https://gamotech-games.vercel.app,http://localhost:5173
 AWS_REGION=ap-south-1
 ```
 
