@@ -74,15 +74,20 @@ Each operation can override `transport` — e.g. debit via API, credit via Kafka
 | POST | `/api/v1/adapters/:operatorId/debit` | Debit wallet |
 | POST | `/api/v1/adapters/:operatorId/credit` | Credit wallet |
 
-### Debit / credit body
+### Debit / credit body (server only)
 
-```json
+Requires `sessionToken` + `X-Game-Server-Key`. `playerId` is resolved from session.
+
+```http
+POST /api/v1/adapters/AAKDA-001/debit
+X-Game-Server-Key: your-game-server-secret
+Authorization: Bearer {sessionToken}
+Content-Type: application/json
+
 {
-  "playerId": "P1001",
-  "playerUsername": "john_doe",
+  "sessionToken": "...",
   "amount": 100,
   "transactionId": "tx_abc123",
-  "gameCode": "TEENPATTI",
   "roundId": "round_001"
 }
 ```
@@ -131,6 +136,8 @@ Secrets resolve from AWS Secrets Manager, or local dev via `env:MY_SECRET_VAR`.
 PORT=3005
 MONGO_URI=mongodb://localhost:27017/operatorAdapter
 CORS_ORIGIN=https://gamotech-games.vercel.app,http://localhost:5173
+SESSION_SERVICE_URL=http://localhost:3004
+GAME_SERVER_API_KEY=your-long-random-secret
 AWS_REGION=ap-south-1
 ```
 

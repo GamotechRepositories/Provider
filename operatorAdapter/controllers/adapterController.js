@@ -1,20 +1,37 @@
 import { executeOperatorOperation } from "../services/adapterExecutor.js";
+import { resolveWalletContext } from "../services/walletGuard.js";
 
-async function runOperation(req, res, operationName, requiredFields = []) {
+async function runWalletOperation(req, res, operationName, requiredFields = []) {
   const { operatorId } = req.params;
-  const input = { ...req.query, ...req.body };
-
-  for (const field of requiredFields) {
-    if (!input[field]) {
-      return res.status(400).json({
-        success: false,
-        message: `${field} is required`,
-      });
-    }
-  }
 
   try {
-    const result = await executeOperatorOperation(operatorId, operationName, input);
+    const context = await resolveWalletContext(req, operatorId);
+
+    if (!context.valid) {
+      return res.status(context.status).json({
+        success: false,
+        message: context.message,
+      });
+    }
+
+    for (const field of requiredFields) {
+      if (
+        context.input[field] === undefined ||
+        context.input[field] === null ||
+        context.input[field] === ""
+      ) {
+        return res.status(400).json({
+          success: false,
+          message: `${field} is required`,
+        });
+      }
+    }
+
+    const result = await executeOperatorOperation(
+      operatorId,
+      operationName,
+      context.input
+    );
 
     if (!result.valid) {
       return res.status(result.status).json({
@@ -40,17 +57,17 @@ async function runOperation(req, res, operationName, requiredFields = []) {
 }
 
 export function getPlayerProfileHandler(req, res) {
-  return runOperation(req, res, "playerProfile", ["playerId"]);
+  return runWalletOperation(req, res, "playerProfile");
 }
 
 export function getBalanceHandler(req, res) {
-  return runOperation(req, res, "balance", ["playerId"]);
+  return runWalletOperation(req, res, "balance");
 }
 
 export function debitHandler(req, res) {
-  return runOperation(req, res, "debit", ["playerId", "amount", "transactionId"]);
+  return runWalletOperation(req, res, "debit", ["amount", "transactionId"]);
 }
 
 export function creditHandler(req, res) {
-  return runOperation(req, res, "credit", ["playerId", "amount", "transactionId"]);
+  return runWalletOperation(req, res, "credit", ["amount", "transactionId"]);
 }

@@ -16,6 +16,10 @@ Full end-to-end guide — operator onboarding, enabled games, launch (HMAC), and
 
 **[game-integration.md](./game-integration.md)**
 
+Game developer integration guide (start here):
+
+**[game-sdk.md](./game-sdk.md)** — simple flow, client vs server, checklist, examples
+
 ## Platform flow
 
 ```

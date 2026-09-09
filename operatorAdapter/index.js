@@ -21,6 +21,12 @@ app.use("/api/v1", adapterRouter);
 
 connectDB()
   .then(() => {
+    if (!process.env.GAME_SERVER_API_KEY) {
+      console.warn(
+        "WARNING: GAME_SERVER_API_KEY is not set — wallet endpoints are not fully protected"
+      );
+    }
+
     app.listen(PORT, () => {
       console.log(`Operator Adapter service running on port ${PORT}`);
     });

@@ -13,6 +13,8 @@ async function proxyToOperatorAdapter(req, res, path, method) {
       url: `${OPERATOR_ADAPTER_SERVICE_URL}/api/v1${path}`,
       headers: {
         "content-type": req.headers["content-type"],
+        "x-game-server-key": req.headers["x-game-server-key"],
+        authorization: req.headers.authorization,
       },
       validateStatus: () => true,
     };
