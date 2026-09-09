@@ -48,7 +48,7 @@ function pickWalletPayload(body = {}) {
   return payload;
 }
 
-export async function resolveWalletContext(req, operatorId) {
+export async function resolveWalletContext(req) {
   const serverAuth = verifyGameServerKey(req);
   if (!serverAuth.valid) {
     return serverAuth;
@@ -63,16 +63,9 @@ export async function resolveWalletContext(req, operatorId) {
 
   const session = sessionResult.session;
 
-  if (session.operatorId !== operatorId) {
-    return {
-      valid: false,
-      status: 403,
-      message: "operatorId does not match session",
-    };
-  }
-
   return {
     valid: true,
+    operatorId: session.operatorId,
     session,
     input: {
       ...pickWalletPayload(req.body),

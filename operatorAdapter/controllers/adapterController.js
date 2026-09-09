@@ -2,10 +2,8 @@ import { executeOperatorOperation } from "../services/adapterExecutor.js";
 import { resolveWalletContext } from "../services/walletGuard.js";
 
 async function runWalletOperation(req, res, operationName, requiredFields = []) {
-  const { operatorId } = req.params;
-
   try {
-    const context = await resolveWalletContext(req, operatorId);
+    const context = await resolveWalletContext(req);
 
     if (!context.valid) {
       return res.status(context.status).json({
@@ -28,7 +26,7 @@ async function runWalletOperation(req, res, operationName, requiredFields = []) 
     }
 
     const result = await executeOperatorOperation(
-      operatorId,
+      context.operatorId,
       operationName,
       context.input
     );
@@ -44,6 +42,7 @@ async function runWalletOperation(req, res, operationName, requiredFields = []) 
     return res.status(result.status).json({
       success: true,
       message: result.async ? "Operation queued" : "Operation completed",
+      operatorId: context.operatorId,
       transport: result.transport,
       async: result.async,
       data: result.data,

@@ -64,58 +64,28 @@ router.delete("/integrations/:operatorId", (req, res) =>
   proxyToOperatorAdapter(req, res, `/integrations/${req.params.operatorId}`, "delete")
 );
 
-router.get("/adapters/:operatorId/player-profile", (req, res) =>
-  proxyToOperatorAdapter(
-    req,
-    res,
-    `/adapters/${req.params.operatorId}/player-profile`,
-    "get"
-  )
+router.get("/adapters/player-profile", (req, res) =>
+  proxyToOperatorAdapter(req, res, "/adapters/player-profile", "get")
 );
 
-router.post("/adapters/:operatorId/player-profile", (req, res) =>
-  proxyToOperatorAdapter(
-    req,
-    res,
-    `/adapters/${req.params.operatorId}/player-profile`,
-    "post"
-  )
+router.post("/adapters/player-profile", (req, res) =>
+  proxyToOperatorAdapter(req, res, "/adapters/player-profile", "post")
 );
 
-router.get("/adapters/:operatorId/balance", (req, res) =>
-  proxyToOperatorAdapter(
-    req,
-    res,
-    `/adapters/${req.params.operatorId}/balance`,
-    "get"
-  )
+router.get("/adapters/balance", (req, res) =>
+  proxyToOperatorAdapter(req, res, "/adapters/balance", "get")
 );
 
-router.post("/adapters/:operatorId/balance", (req, res) =>
-  proxyToOperatorAdapter(
-    req,
-    res,
-    `/adapters/${req.params.operatorId}/balance`,
-    "post"
-  )
+router.post("/adapters/balance", (req, res) =>
+  proxyToOperatorAdapter(req, res, "/adapters/balance", "post")
 );
 
-router.post("/adapters/:operatorId/debit", (req, res) =>
-  proxyToOperatorAdapter(
-    req,
-    res,
-    `/adapters/${req.params.operatorId}/debit`,
-    "post"
-  )
+router.post("/adapters/debit", (req, res) =>
+  proxyToOperatorAdapter(req, res, "/adapters/debit", "post")
 );
 
-router.post("/adapters/:operatorId/credit", (req, res) =>
-  proxyToOperatorAdapter(
-    req,
-    res,
-    `/adapters/${req.params.operatorId}/credit`,
-    "post"
-  )
+router.post("/adapters/credit", (req, res) =>
+  proxyToOperatorAdapter(req, res, "/adapters/credit", "post")
 );
 
 export default router;

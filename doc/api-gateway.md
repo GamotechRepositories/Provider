@@ -33,10 +33,10 @@ API Gateway (:3000)
 | POST | `/api/v1/sessions/events` | Session Service `/api/v1/sessions/events` |
 | GET | `/api/v1/sessions/track?sessionToken=` | Session Service `/api/v1/sessions/track` |
 | GET/POST/PUT/PATCH/DELETE | `/api/v1/integrations/*` | Operator Adapter integration CRUD |
-| GET/POST | `/api/v1/adapters/:operatorId/player-profile` | Operator Adapter player profile |
-| GET/POST | `/api/v1/adapters/:operatorId/balance` | Operator Adapter balance |
-| POST | `/api/v1/adapters/:operatorId/debit` | Operator Adapter debit |
-| POST | `/api/v1/adapters/:operatorId/credit` | Operator Adapter credit |
+| GET/POST | `/api/v1/adapters/player-profile` | Operator Adapter player profile |
+| GET/POST | `/api/v1/adapters/balance` | Operator Adapter balance |
+| POST | `/api/v1/adapters/debit` | Operator Adapter debit |
+| POST | `/api/v1/adapters/credit` | Operator Adapter credit |
 
 ## Environment
 

@@ -69,17 +69,19 @@ Each operation can override `transport` — e.g. debit via API, credit via Kafka
 
 | Method | Route | Description |
 |--------|-------|-------------|
-| GET/POST | `/api/v1/adapters/:operatorId/player-profile` | Fetch player info |
-| GET/POST | `/api/v1/adapters/:operatorId/balance` | Fetch balance |
-| POST | `/api/v1/adapters/:operatorId/debit` | Debit wallet |
-| POST | `/api/v1/adapters/:operatorId/credit` | Credit wallet |
+| GET/POST | `/api/v1/adapters/player-profile` | Fetch player info |
+| GET/POST | `/api/v1/adapters/balance` | Fetch balance |
+| POST | `/api/v1/adapters/debit` | Debit wallet |
+| POST | `/api/v1/adapters/credit` | Credit wallet |
+
+`operatorId` is resolved from `sessionToken` — not required in the URL.
 
 ### Debit / credit body (server only)
 
-Requires `sessionToken` + `X-Game-Server-Key`. `playerId` is resolved from session.
+Requires `sessionToken` + `X-Game-Server-Key`. `operatorId` and `playerId` are resolved from session.
 
 ```http
-POST /api/v1/adapters/AAKDA-001/debit
+POST /api/v1/adapters/debit
 X-Game-Server-Key: your-game-server-secret
 Authorization: Bearer {sessionToken}
 Content-Type: application/json
@@ -98,6 +100,7 @@ Content-Type: application/json
 {
   "success": true,
   "message": "Operation completed",
+  "operatorId": "AAKDA-001",
   "transport": "API",
   "async": false,
   "data": { "balance": 900 }

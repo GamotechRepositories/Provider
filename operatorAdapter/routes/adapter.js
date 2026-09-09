@@ -8,13 +8,13 @@ import {
 
 const router = Router();
 
-router.get("/adapters/:operatorId/player-profile", getPlayerProfileHandler);
-router.post("/adapters/:operatorId/player-profile", getPlayerProfileHandler);
+router.get("/adapters/player-profile", getPlayerProfileHandler);
+router.post("/adapters/player-profile", getPlayerProfileHandler);
 
-router.get("/adapters/:operatorId/balance", getBalanceHandler);
-router.post("/adapters/:operatorId/balance", getBalanceHandler);
+router.get("/adapters/balance", getBalanceHandler);
+router.post("/adapters/balance", getBalanceHandler);
 
-router.post("/adapters/:operatorId/debit", debitHandler);
-router.post("/adapters/:operatorId/credit", creditHandler);
+router.post("/adapters/debit", debitHandler);
+router.post("/adapters/credit", creditHandler);
 
 export default router;

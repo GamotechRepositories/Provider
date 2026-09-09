@@ -140,7 +140,6 @@ await fetch("https://your-game-api.com/bet", {
   headers: { "Content-Type": "application/json" },
   body: JSON.stringify({
     sessionToken: sdk.sessionToken,
-    operatorId: sdk.operatorId,
     amount: 100,
     roundId: "round_1",
     transactionId: "debit_round_1",  // unique per debit
@@ -155,7 +154,7 @@ await fetch("https://your-game-api.com/bet", {
 Your server validates the bet (round exists, amount OK, not already debited), then calls Provider:
 
 ```http
-POST /api/v1/adapters/AAKDA-001/debit
+POST /api/v1/adapters/debit
 X-Game-Server-Key: your-secret-key
 Authorization: Bearer {sessionToken}
 Content-Type: application/json
@@ -168,8 +167,7 @@ Content-Type: application/json
 }
 ```
 
-Provider checks session + server key, then debits the operator wallet.  
-`playerId` is taken from the session — you cannot spoof it.
+Provider validates session, resolves `operatorId` and `playerId` from the session, then debits the operator wallet.
 
 ---
 
@@ -183,7 +181,7 @@ This runs on **your game server** (WebSocket, REST, etc.).
 ### Step 7 — Player wins → credit (your server only)
 
 ```http
-POST /api/v1/adapters/AAKDA-001/credit
+POST /api/v1/adapters/credit
 X-Game-Server-Key: your-secret-key
 Authorization: Bearer {sessionToken}
 
@@ -283,10 +281,12 @@ sdk.attachUnloadHandler(); // auto end on tab close
 
 | Action | Method | Path |
 |--------|--------|------|
-| Get balance | POST | `/adapters/{operatorId}/balance` |
-| Debit | POST | `/adapters/{operatorId}/debit` |
-| Credit | POST | `/adapters/{operatorId}/credit` |
-| Player profile | POST | `/adapters/{operatorId}/player-profile` |
+| Get balance | POST | `/adapters/balance` |
+| Debit | POST | `/adapters/debit` |
+| Credit | POST | `/adapters/credit` |
+| Player profile | POST | `/adapters/player-profile` |
+
+`operatorId` is resolved from `sessionToken` — do not pass it in the URL.
 
 ---
 
@@ -314,7 +314,7 @@ Non-JavaScript backends: use REST only (see section 8).
 
 ```javascript
 const response = await fetch(
-  `${PROVIDER_API}/adapters/${operatorId}/debit`,
+  `${PROVIDER_API}/adapters/debit`,
   {
     method: "POST",
     headers: {
@@ -331,7 +331,7 @@ const response = await fetch(
 
 ```python
 requests.post(
-    f"{PROVIDER_API}/adapters/{operator_id}/debit",
+    f"{PROVIDER_API}/adapters/debit",
     json={"sessionToken": token, "amount": 100, "transactionId": "tx_1", "roundId": "r1"},
     headers={
         "X-Game-Server-Key": GAME_SERVER_KEY,
@@ -345,7 +345,7 @@ requests.post(
 ```java
 headers.set("X-Game-Server-Key", gameServerApiKey);
 headers.setBearerAuth(sessionToken);
-restTemplate.postForEntity(providerApi + "/adapters/" + operatorId + "/debit", body, Map.class);
+restTemplate.postForEntity(providerApi + "/adapters/debit", body, Map.class);
 ```
 
 ---
@@ -387,8 +387,7 @@ GAME_SERVER_API_KEY=your-long-random-secret
 |-------|-----|
 | Missing sessionToken | Player must come from operator launch URL |
 | 401 on wallet | Missing or wrong `X-Game-Server-Key` |
-| 403 operatorId mismatch | Use `operatorId` from validated session |
-| 404 integration | Admin must create operator integration on OPA |
+| 404 integration | Admin must create operator integration on OPA for session's operator |
 | Session expired | Player must re-launch from operator |
 
 ---
@@ -443,4 +442,4 @@ async function main() {
 main().catch((err) => alert(err.message));
 ```
 
-Your `/api/bet` route (server) calls Provider `/adapters/{operatorId}/debit` with `GAME_SERVER_API_KEY`.
+Your `/api/bet` route (server) calls Provider `/adapters/debit` with `sessionToken` + `GAME_SERVER_API_KEY`.
