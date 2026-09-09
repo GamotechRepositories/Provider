@@ -70,7 +70,7 @@ Confirm the token is valid and load player info.
 **SDK (web games):**
 
 ```javascript
-import { ProviderGameSDK } from "@provider/game-sdk";
+import { ProviderGameSDK } from "@gamotech/game-sdk";
 
 const sdk = new ProviderGameSDK({
   apiBaseUrl: "https://api.dpbossking.com/api/v1",
@@ -255,7 +255,7 @@ sdk.attachUnloadHandler(); // auto end on tab close
 | Send session events | Put server secret in frontend |
 | Call your game server for bets | Trust URL params for playerId |
 
-**Tool:** `@provider/game-sdk` (client) or REST
+**Tool:** `@gamotech/game-sdk` (client) or REST
 
 ### Game server (backend)
 
@@ -266,7 +266,7 @@ sdk.attachUnloadHandler(); // auto end on tab close
 | Use unique `transactionId` per operation | Reuse same transactionId |
 
 **Tool:** REST in any language (Python, Java, Node, Go, …)  
-**Optional:** `@provider/game-sdk/server` for Node only
+**Optional:** `@gamotech/game-sdk/server` for Node only
 
 ---
 
@@ -293,15 +293,15 @@ sdk.attachUnloadHandler(); // auto end on tab close
 ## 7. Install SDK (web games only)
 
 ```bash
-npm install @provider/game-sdk
+npm install @gamotech/game-sdk
 ```
 
 ```javascript
 // Client (browser)
-import { ProviderGameSDK } from "@provider/game-sdk";
+import { ProviderGameSDK } from "@gamotech/game-sdk";
 
 // Server (Node only — optional)
-import { ProviderGameServerSDK } from "@provider/game-sdk/server";
+import { ProviderGameServerSDK } from "@gamotech/game-sdk/server";
 ```
 
 Non-JavaScript backends: use REST only (see section 8).
@@ -404,7 +404,7 @@ GAME_SERVER_API_KEY=your-long-random-secret
 ## 13. Minimal copy-paste starter (web game)
 
 ```javascript
-import { ProviderGameSDK } from "@provider/game-sdk";
+import { ProviderGameSDK } from "@gamotech/game-sdk";
 
 const sdk = new ProviderGameSDK({
   apiBaseUrl: "https://api.dpbossking.com/api/v1",
