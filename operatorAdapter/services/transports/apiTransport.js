@@ -1,6 +1,6 @@
 import axios from "axios";
 import { joinUrl, resolvePath } from "../../utils/pathResolver.js";
-import { buildAuthHeaders } from "../authService.js";
+import { buildOperationHeaders } from "../authService.js";
 
 export async function executeApiOperation({
   integration,
@@ -17,7 +17,7 @@ export async function executeApiOperation({
 
   const body =
     method === "get" || method === "delete" ? undefined : payload ?? {};
-  const authHeaders = await buildAuthHeaders(integration.auth, {
+  const authHeaders = await buildOperationHeaders(integration, operation, {
     method: operation.method || "POST",
     path: resolvedPath,
     body,

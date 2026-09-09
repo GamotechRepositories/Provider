@@ -37,13 +37,16 @@ Operator Adapter
   "transport": { "type": "API", "api": { "baseUrl": "https://..." } },
   "auth": { "type": "HMAC", "hmac": { "secretRef": "..." } },
   "operations": {
-    "playerProfile": { "method": "GET", "path": "/players/{playerId}" },
+    "playerProfile": { "method": "GET", "path": "/players/{playerId}", "timeoutMs": 10000 },
     "balance": { "method": "GET", "path": "/players/{playerId}/balance" },
     "debit": { "method": "POST", "path": "/wallet/debit" },
     "credit": {
       "transport": { "type": "KAFKA", "kafka": { "brokers": ["..."], "topic": "credit" } }
     }
   },
+  "createdBy": "admin@provider.com",
+  "updatedBy": "admin@provider.com",
+  "publishedBy": "admin@provider.com",
   "capabilities": {
     "supportsDebit": true,
     "supportsCredit": true,
@@ -53,6 +56,88 @@ Operator Adapter
 ```
 
 Each operation can override `transport` — e.g. debit via API, credit via Kafka.
+
+Each operation can also define its own **auth**, **headers**, and **payload** so every URL can follow a different operator flow.
+
+```json
+{
+  "operations": {
+    "debit": {
+      "method": "POST",
+      "path": "wallet/debit",
+      "auth": {
+        "type": "BEARER",
+        "bearer": { "tokenRef": "env:AAKDA_BEARER_TOKEN" }
+      },
+      "headers": {
+        "X-Request-Source": "gamotech",
+        "Authorization": {
+          "valueRef": "env:AAKDA_BEARER_TOKEN",
+          "prefix": "Bearer "
+        }
+      },
+      "payload": {
+        "static": { "currency": "INR" },
+        "mapping": {
+          "amount": "betAmount",
+          "transactionId": "txnId",
+          "playerId": "userId"
+        },
+        "template": {
+          "gameCode": "{gameCode}",
+          "roundId": "{roundId}"
+        }
+      }
+    },
+    "balance": {
+      "method": "GET",
+      "path": "wallet/balance/{playerId}",
+      "headers": {
+        "Authorization": "env:AAKDA_BEARER_TOKEN"
+      }
+    }
+  }
+}
+```
+
+**Payload fields**
+
+| Field | Purpose |
+|-------|---------|
+| `payload.static` | Always send these fields |
+| `payload.mapping` | Rename incoming fields (same as legacy `requestMapping`) |
+| `payload.template` | Body template with placeholders like `{playerId}`, `{amount}` |
+
+**Headers (dynamic)**
+
+`headers` accepts any shape — object map or array:
+
+```json
+{
+  "Authorization": {
+    "valueRef": "env:AAKDA_BEARER_TOKEN",
+    "prefix": "Bearer ",
+    "suffix": ""
+  },
+  "X-Source": "gamotech",
+  "X-Api-Key": "env:AAKDA_API_KEY"
+}
+```
+
+Or array form:
+
+```json
+[
+  { "name": "Authorization", "valueRef": "env:TOKEN", "prefix": "Bearer " },
+  { "X-Custom": "literal-value" }
+]
+```
+
+String values starting with `env:` or AWS secret paths are resolved at runtime. Any extra fields on header entries (e.g. `prefix`, `suffix`) are supported.
+
+`auth.type` is a free-form string. Built-in presets: `NONE`, `API_KEY`, `BEARER`, `BASIC`, `HMAC`, `CUSTOM`. For anything else, use `auth.headers` or per-operation `headers`.
+
+Operation-level `auth` overrides integration-level `auth` for that URL only.
 
 ## Integration CRUD
 
@@ -127,11 +212,19 @@ Content-Type: application/json
 | `RABBITMQ` | Async queue credit/debit | `transport.rabbitmq.url` + `exchange` or `queue` |
 | `KAFKA` | Async event credit | `transport.kafka.brokers`, `topic` |
 
-## Auth types
+## Auth and secrets
 
-`NONE`, `API_KEY`, `BEARER`, `BASIC`, `HMAC`, `CUSTOM`
+`auth.type` enum: `NONE`, `API_KEY`, `BEARER`, `BASIC`, `HMAC`, `CUSTOM`.
+
+`operations` is a dynamic map — add any operation key (`debit`, `balance`, custom flows).
+
+`timeoutMs` on operations and `transport.api.timeoutMs` must be between `100` and `60000`.
+
+Audit fields: `createdBy`, `updatedBy`, `publishedBy`.
 
 Secrets resolve from AWS Secrets Manager, or local dev via `env:MY_SECRET_VAR`.
+
+For custom operator flows, set `auth.type` to any label and define `auth.headers` or per-operation `headers` with `valueRef`.
 
 ## Environment
 

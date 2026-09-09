@@ -37,6 +37,24 @@ function validateTransport(transport, label = "transport") {
   return validator(transport);
 }
 
+function normalizeMap(value) {
+  if (value instanceof Map) {
+    return Object.fromEntries(value.entries());
+  }
+
+  return value ?? {};
+}
+
+function validateTimeoutMs(timeoutMs, label) {
+  if (timeoutMs === undefined || timeoutMs === null) return null;
+
+  if (timeoutMs < 100 || timeoutMs > 60000) {
+    return `${label} must be between 100 and 60000`;
+  }
+
+  return null;
+}
+
 function validateOperation(operation, name, defaultTransport) {
   if (!operation) return null;
 
@@ -49,6 +67,12 @@ function validateOperation(operation, name, defaultTransport) {
   if (operation.enabled !== false && transport?.type === "API" && !operation.path) {
     return `operations.${name}.path is required for API-based operations`;
   }
+
+  const timeoutError = validateTimeoutMs(
+    operation.timeoutMs,
+    `operations.${name}.timeoutMs`
+  );
+  if (timeoutError) return timeoutError;
 
   return null;
 }
@@ -64,16 +88,27 @@ export function validateIntegrationPayload(payload, { partial = false } = {}) {
   if (payload.transport) {
     const transportError = validateTransport(payload.transport);
     if (transportError) return transportError;
+
+    const transportTimeoutError = validateTimeoutMs(
+      payload.transport?.api?.timeoutMs,
+      "transport.api.timeoutMs"
+    );
+    if (transportTimeoutError) return transportTimeoutError;
+  }
+
+  if (payload.auth?.type) {
+    const authTypes = ["NONE", "API_KEY", "BEARER", "BASIC", "HMAC", "CUSTOM"];
+    if (!authTypes.includes(payload.auth.type)) {
+      return `auth.type must be one of: ${authTypes.join(", ")}`;
+    }
   }
 
   if (payload.operations) {
     const defaultTransport = payload.transport;
-    for (const opName of ["playerProfile", "balance", "debit", "credit"]) {
-      const error = validateOperation(
-        payload.operations[opName],
-        opName,
-        defaultTransport
-      );
+    const operations = normalizeMap(payload.operations);
+
+    for (const [opName, operation] of Object.entries(operations)) {
+      const error = validateOperation(operation, opName, defaultTransport);
       if (error) return error;
     }
   }
@@ -82,7 +117,10 @@ export function validateIntegrationPayload(payload, { partial = false } = {}) {
 }
 
 function formatIntegration(doc) {
-  const integration = doc.toObject ? doc.toObject() : doc;
+  const integration = doc.toObject
+    ? doc.toObject({ flattenMaps: true })
+    : doc;
+
   return {
     ...integration,
     _id: integration._id?.toString(),
@@ -144,9 +182,12 @@ export async function updateIntegration(operatorId, payload) {
     environment: payload.environment ?? integration.environment,
     transport: payload.transport ?? integration.transport,
     auth: payload.auth ?? integration.auth,
-    operations: payload.operations ?? integration.operations,
+    operations: payload.operations ?? normalizeMap(integration.operations),
     capabilities: payload.capabilities ?? integration.capabilities,
     metadata: payload.metadata ?? integration.metadata,
+    createdBy: integration.createdBy,
+    updatedBy: payload.updatedBy ?? integration.updatedBy,
+    publishedBy: payload.publishedBy ?? integration.publishedBy,
   };
 
   const validationError = validateIntegrationPayload(merged);

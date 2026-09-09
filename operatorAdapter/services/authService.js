@@ -1,7 +1,18 @@
 import { buildHmacSignature, resolveSecret } from "./secretsService.js";
+import { buildConfiguredHeaders } from "../utils/headerResolver.js";
+
+export { buildConfiguredHeaders };
+
+export function resolveOperationAuth(integration = {}, operation = {}) {
+  return operation?.auth ?? integration?.auth ?? { type: "NONE" };
+}
 
 export async function buildAuthHeaders(auth = {}, { method, path, body } = {}) {
   const headers = {};
+
+  if (auth?.headers?.length) {
+    Object.assign(headers, await buildConfiguredHeaders(auth.headers));
+  }
 
   if (!auth?.type || auth.type === "NONE") {
     return headers;
@@ -65,4 +76,15 @@ export async function buildAuthHeaders(auth = {}, { method, path, body } = {}) {
   }
 
   return headers;
+}
+
+export async function buildOperationHeaders(integration, operation, context = {}) {
+  const auth = resolveOperationAuth(integration, operation);
+  const authHeaders = await buildAuthHeaders(auth, context);
+  const operationHeaders = await buildConfiguredHeaders(operation?.headers ?? []);
+
+  return {
+    ...authHeaders,
+    ...operationHeaders,
+  };
 }

@@ -1,5 +1,6 @@
 import { getIntegrationByOperatorId } from "./operatorIntegrationService.js";
-import { mapRequest, mapResponse } from "../utils/requestMapper.js";
+import { mapResponse } from "../utils/requestMapper.js";
+import { buildOperationPayload } from "../utils/payloadBuilder.js";
 import { executeApiOperation } from "./transports/apiTransport.js";
 import { executeRabbitmqOperation } from "./transports/rabbitmqTransport.js";
 import { executeKafkaOperation } from "./transports/kafkaTransport.js";
@@ -89,7 +90,7 @@ export async function executeOperatorOperation(operatorId, operationName, input 
     transactionId: input.transactionId,
   };
 
-  const mappedPayload = mapRequest(input, operation.requestMapping);
+  const mappedPayload = buildOperationPayload(input, operation, pathParams);
 
   try {
     const result = await dispatchOperation({

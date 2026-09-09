@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 
 const HTTP_METHODS = ["GET", "POST", "PUT", "PATCH", "DELETE"];
+const AUTH_TYPES = ["NONE", "API_KEY", "BEARER", "BASIC", "HMAC", "CUSTOM"];
 
 const transportSchema = new mongoose.Schema(
   {
@@ -11,7 +12,7 @@ const transportSchema = new mongoose.Schema(
     },
     api: {
       baseUrl: String,
-      timeoutMs: { type: Number, default: 10000 },
+      timeoutMs: { type: Number, min: 100, max: 60000, default: 10000 },
     },
     rabbitmq: {
       url: String,
@@ -37,8 +38,13 @@ const authSchema = new mongoose.Schema(
   {
     type: {
       type: String,
-      enum: ["NONE", "API_KEY", "BEARER", "BASIC", "HMAC", "CUSTOM"],
+      enum: AUTH_TYPES,
       default: "NONE",
+    },
+    headers: {
+      type: Map,
+      of: mongoose.Schema.Types.Mixed,
+      default: undefined,
     },
     apiKey: {
       header: { type: String, default: "X-API-Key" },
@@ -69,15 +75,31 @@ const authSchema = new mongoose.Schema(
   { _id: false }
 );
 
+const payloadSchema = new mongoose.Schema(
+  {
+    static: mongoose.Schema.Types.Mixed,
+    mapping: mongoose.Schema.Types.Mixed,
+    template: mongoose.Schema.Types.Mixed,
+  },
+  { _id: false }
+);
+
 const operationSchema = new mongoose.Schema(
   {
     enabled: { type: Boolean, default: true },
     method: { type: String, enum: HTTP_METHODS, default: "POST" },
     path: String,
     contentType: { type: String, default: "application/json" },
+    auth: authSchema,
+    headers: {
+      type: Map,
+      of: mongoose.Schema.Types.Mixed,
+      default: undefined,
+    },
+    payload: payloadSchema,
     requestMapping: mongoose.Schema.Types.Mixed,
     responseMapping: mongoose.Schema.Types.Mixed,
-    timeoutMs: { type: Number, default: 10000 },
+    timeoutMs: { type: Number, min: 100, max: 60000, default: 10000 },
     transport: transportSchema,
   },
   { _id: false }
@@ -126,10 +148,9 @@ const operatorIntegrationSchema = new mongoose.Schema(
       default: () => ({ type: "NONE" }),
     },
     operations: {
-      playerProfile: operationSchema,
-      balance: operationSchema,
-      debit: operationSchema,
-      credit: operationSchema,
+      type: Map,
+      of: operationSchema,
+      default: () => ({}),
     },
     capabilities: {
       type: capabilitiesSchema,
@@ -139,8 +160,13 @@ const operatorIntegrationSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.Mixed,
       default: {},
     },
+    createdBy: { type: String, trim: true },
+    updatedBy: { type: String, trim: true },
+    publishedBy: { type: String, trim: true },
   },
   { timestamps: true }
 );
+
+operatorIntegrationSchema.index({ status: 1, environment: 1 });
 
 export default mongoose.model("OperatorIntegration", operatorIntegrationSchema);
