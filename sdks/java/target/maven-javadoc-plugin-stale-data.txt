@@ -1,0 +1,49 @@
+-J-Duser.language=
+-J-Duser.country=
+@options
+@packages
+-classpath
+'/Users/prajwalkamdi/.m2/repository/com/google/code/gson/gson/2.11.0/gson-2.11.0.jar:/Users/prajwalkamdi/.m2/repository/com/google/errorprone/error_prone_annotations/2.27.0/error_prone_annotations-2.27.0.jar'
+-encoding
+'UTF-8'
+-protected
+-source
+'11'
+-sourcepath
+'/Users/prajwalkamdi/Desktop/Provider/sdks/java/src/main/java:/Users/prajwalkamdi/Desktop/Provider/sdks/java/target/generated-sources/annotations'
+-author
+-bottom
+'Copyright &#169; 2026. All rights reserved.'
+-charset
+'UTF-8'
+-d
+'/Users/prajwalkamdi/Desktop/Provider/sdks/java/target/reports/apidocs'
+-docencoding
+'UTF-8'
+-doctitle
+'Gamotech Provider Game SDK 1.0.0 API'
+-linkoffline
+'https://docs.oracle.com/en/java/javase/11/docs/api' '/Users/prajwalkamdi/Desktop/Provider/sdks/java/target/javadoc-bundle-options'
+-use
+-version
+-windowtitle
+'Gamotech Provider Game SDK 1.0.0 API'
+in.oreng.gamesdk
+/Users/prajwalkamdi/.m2/repository/com/google/code/gson/gson/2.11.0/gson-2.11.0.jar = 1716144881000
+/Users/prajwalkamdi/.m2/repository/com/google/errorprone/error_prone_annotations/2.27.0/error_prone_annotations-2.27.0.jar = 1714146969000
+/Users/prajwalkamdi/Desktop/Provider/sdks/java/src/main/java = 1789025863150
+/Users/prajwalkamdi/Desktop/Provider/sdks/java/target/generated-sources/annotations = 1789035244691
+/Users/prajwalkamdi/Desktop/Provider/sdks/java/target/reports/apidocs/tag-search-index.js = 1789035245683
+/Users/prajwalkamdi/Desktop/Provider/sdks/java/target/reports/apidocs/overview-tree.html = 1789035245678
+/Users/prajwalkamdi/Desktop/Provider/sdks/java/target/reports/apidocs/module-search-index.js = 1789035245683
+/Users/prajwalkamdi/Desktop/Provider/sdks/java/target/reports/apidocs/index.html = 1789035245688
+/Users/prajwalkamdi/Desktop/Provider/sdks/java/target/reports/apidocs/package-search-index.js = 1789035245683
+/Users/prajwalkamdi/Desktop/Provider/sdks/java/target/reports/apidocs/serialized-form.html = 1789035245668
+/Users/prajwalkamdi/Desktop/Provider/sdks/java/target/reports/apidocs/index-all.html = 1789035245687
+/Users/prajwalkamdi/Desktop/Provider/sdks/java/target/reports/apidocs/allpackages-index.html = 1789035245682
+/Users/prajwalkamdi/Desktop/Provider/sdks/java/target/reports/apidocs/member-search-index.js = 1789035245683
+/Users/prajwalkamdi/Desktop/Provider/sdks/java/target/reports/apidocs/help-doc.html = 1789035245690
+/Users/prajwalkamdi/Desktop/Provider/sdks/java/target/reports/apidocs/element-list = 1789035245661
+/Users/prajwalkamdi/Desktop/Provider/sdks/java/target/reports/apidocs/search.html = 1789035245687
+/Users/prajwalkamdi/Desktop/Provider/sdks/java/target/reports/apidocs/allclasses-index.html = 1789035245682
+/Users/prajwalkamdi/Desktop/Provider/sdks/java/target/reports/apidocs/type-search-index.js = 1789035245683

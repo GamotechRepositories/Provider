@@ -1,9 +1,9 @@
-import { ProviderSDKError } from "./client.js";
+import { ProviderSDKError } from "./errors.js";
 
 const DEFAULT_API_BASE = "https://api.dpbossking.com/api/v1";
 
 /**
- * Optional Node server SDK — wallet operations (balance, debit, credit).
+ * Node.js game server SDK — wallet operations (balance, debit, credit).
  * operatorId is resolved from sessionToken server-side — do not pass it.
  */
 export class ProviderGameServerSDK {
@@ -122,4 +122,5 @@ export class ProviderGameServerSDK {
   }
 }
 
+export { ProviderSDKError };
 export default ProviderGameServerSDK;

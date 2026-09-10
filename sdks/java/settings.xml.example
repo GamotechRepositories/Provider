@@ -1,0 +1,37 @@
+<!--
+  Copy to ~/.m2/settings.xml (Maven does NOT read this file in the repo).
+
+  1. cp sdks/java/settings.xml.example ~/.m2/settings.xml
+  2. Replace YOUR_SONATYPE_* and YOUR_KEY_ID with real values
+  3. Never commit ~/.m2/settings.xml or real tokens to git
+
+  Sonatype token: https://central.sonatype.com/ → Account → Generate User Token
+  GPG key ID:     gpg --list-secret-keys --keyid-format LONG
+-->
+<settings xmlns="http://maven.apache.org/SETTINGS/1.2.0"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.2.0
+          https://maven.apache.org/xsettings-1.2.0.xsd">
+
+  <servers>
+    <server>
+      <id>central</id>
+      <username>YOUR_SONATYPE_TOKEN_USERNAME</username>
+      <password>YOUR_SONATYPE_TOKEN_PASSWORD</password>
+    </server>
+  </servers>
+
+  <profiles>
+    <profile>
+      <id>gpg</id>
+      <properties>
+        <gpg.keyname>YOUR_KEY_ID</gpg.keyname>
+      </properties>
+    </profile>
+  </profiles>
+
+  <activeProfiles>
+    <activeProfile>gpg</activeProfile>
+  </activeProfiles>
+
+</settings>

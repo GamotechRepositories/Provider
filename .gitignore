@@ -104,6 +104,11 @@ serviceAccountKey.json
 docker-compose.override.yml
 
 # ==========================
+# Maven local secrets (never commit)
+# ==========================
+sdks/java/settings.local.xml
+
+# ==========================
 # Misc
 # ==========================
 *.zip

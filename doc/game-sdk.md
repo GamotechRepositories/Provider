@@ -70,7 +70,7 @@ Confirm the token is valid and load player info.
 **SDK (web games):**
 
 ```javascript
-import { ProviderGameSDK } from "@gamotech/game-sdk";
+import { ProviderGameSDK } from "@gamotech/game-sdk-client";
 
 const sdk = new ProviderGameSDK({
   apiBaseUrl: "https://api.dpbossking.com/api/v1",
@@ -253,7 +253,7 @@ sdk.attachUnloadHandler(); // auto end on tab close
 | Send session events | Put server secret in frontend |
 | Call your game server for bets | Trust URL params for playerId |
 
-**Tool:** `@gamotech/game-sdk` (client) or REST
+**Tool:** `@gamotech/game-sdk-client` or REST
 
 ### Game server (backend)
 
@@ -263,8 +263,8 @@ sdk.attachUnloadHandler(); // auto end on tab close
 | Call Provider debit/credit/balance | Skip sessionToken on wallet calls |
 | Use unique `transactionId` per operation | Reuse same transactionId |
 
-**Tool:** REST in any language (Python, Java, Node, Go, …)  
-**Optional:** `@gamotech/game-sdk/server` for Node only
+**Tool:** `@gamotech/game-sdk-nodejs` (Node) or `in.oreng:game-sdk` (Java)  
+**Also works:** REST in any language
 
 ---
 
@@ -290,41 +290,135 @@ sdk.attachUnloadHandler(); // auto end on tab close
 
 ---
 
-## 7. Install SDK (web games only)
+## 7. Install SDK
+
+> SDK docs: [sdk-client.md](./sdk-client.md) · [sdk-nodejs.md](./sdk-nodejs.md) · [sdk-java.md](./sdk-java.md) · [sdks.md](./sdks.md)
+
+Three separate packages — pick what your stack needs:
+
+| Package | Use for |
+|---------|---------|
+| `@gamotech/game-sdk-client` | Browser / game frontend |
+| `@gamotech/game-sdk-nodejs` | Node.js game server |
+| `in.oreng:game-sdk` | Java game server (Spring, etc.) |
+
+### Browser (JavaScript)
+
+```bash
+npm install @gamotech/game-sdk-client
+```
+
+```javascript
+import { ProviderGameSDK } from "@gamotech/game-sdk-client";
+```
+
+### Node.js game server
+
+```bash
+npm install @gamotech/game-sdk-nodejs
+```
+
+```javascript
+import { ProviderGameServerSDK } from "@gamotech/game-sdk-nodejs";
+
+const wallet = new ProviderGameServerSDK({
+  apiBaseUrl: process.env.PROVIDER_API_URL,
+  gameServerKey: process.env.GAME_SERVER_API_KEY,
+});
+
+await wallet.debit({
+  sessionToken,
+  amount: 100,
+  transactionId: "tx_abc",
+  roundId: "round_1",
+});
+```
+
+### Java game server
+
+Add to `pom.xml`:
+
+```xml
+<dependency>
+  <groupId>in.oreng</groupId>
+  <artifactId>game-sdk</artifactId>
+  <version>1.0.0</version>
+</dependency>
+```
+
+**Publish to Maven Central** (one-time setup, then same as npm publish):
+
+1. Install JDK 11+ and Maven: `brew install openjdk@11 maven`
+2. Create account at [central.sonatype.com](https://central.sonatype.com/) and register namespace `in.oreng` (domain: `oreng.in`)
+3. Generate GPG key: `gpg --full-generate-key` then `gpg --keyserver keyserver.ubuntu.com --send-keys YOUR_KEY_ID`
+4. Add Sonatype token to `~/.m2/settings.xml` (see `sdks/java/settings.xml.example`)
+5. Publish:
+
+```bash
+cd sdks/java
+mvn clean deploy -Prelease
+```
+
+After sync (~15 min), games add:
+
+```xml
+<dependency>
+  <groupId>in.oreng</groupId>
+  <artifactId>game-sdk</artifactId>
+  <version>1.0.0</version>
+</dependency>
+```
+
+**Local dev only** (no Maven Central):
+
+```bash
+cd sdks/java && mvn install
+```
+
+```java
+import in.oreng.gamesdk.ProviderGameServerSDK;
+import in.oreng.gamesdk.WalletOperationRequest;
+import com.google.gson.JsonObject;
+
+ProviderGameServerSDK wallet = new ProviderGameServerSDK(
+    System.getenv("PROVIDER_API_URL"),
+    System.getenv("GAME_SERVER_API_KEY")
+);
+
+JsonObject balance = wallet.getBalance(sessionToken);
+
+JsonObject debitResult = wallet.debit(
+    WalletOperationRequest.builder()
+        .sessionToken(sessionToken)
+        .amount(100)
+        .transactionId("tx_abc")
+        .roundId("round_1")
+        .build()
+);
+```
+
+**Legacy meta-package** (still works):
 
 ```bash
 npm install @gamotech/game-sdk
 ```
 
-```javascript
-// Client (browser)
-import { ProviderGameSDK } from "@gamotech/game-sdk";
-
-// Server (Node only — optional)
-import { ProviderGameServerSDK } from "@gamotech/game-sdk/server";
-```
-
-Non-JavaScript backends: use REST only (see section 8).
-
 ---
 
-## 8. Server examples (pick your stack)
+## 8. Server examples (REST fallback)
 
-### Node / Express (MERN)
+### Node / Express (raw REST)
 
 ```javascript
-const response = await fetch(
-  `${PROVIDER_API}/adapters/debit`,
-  {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "X-Game-Server-Key": process.env.GAME_SERVER_API_KEY,
-      Authorization: `Bearer ${sessionToken}`,
-    },
-    body: JSON.stringify({ sessionToken, amount, transactionId, roundId }),
-  }
-);
+const response = await fetch(`${PROVIDER_API}/adapters/debit`, {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+    "X-Game-Server-Key": process.env.GAME_SERVER_API_KEY,
+    Authorization: `Bearer ${sessionToken}`,
+  },
+  body: JSON.stringify({ sessionToken, amount, transactionId, roundId }),
+});
 ```
 
 ### Python
@@ -338,14 +432,6 @@ requests.post(
         "Authorization": f"Bearer {token}",
     },
 )
-```
-
-### Java
-
-```java
-headers.set("X-Game-Server-Key", gameServerApiKey);
-headers.setBearerAuth(sessionToken);
-restTemplate.postForEntity(providerApi + "/adapters/debit", body, Map.class);
 ```
 
 ---
@@ -403,7 +489,7 @@ GAME_SERVER_API_KEY=your-long-random-secret
 ## 13. Minimal copy-paste starter (web game)
 
 ```javascript
-import { ProviderGameSDK } from "@gamotech/game-sdk";
+import { ProviderGameSDK } from "@gamotech/game-sdk-client";
 
 const sdk = new ProviderGameSDK({
   apiBaseUrl: "https://api.dpbossking.com/api/v1",

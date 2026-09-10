@@ -20,6 +20,15 @@ Game developer integration guide (start here):
 
 **[game-sdk.md](./game-sdk.md)** — simple flow, client vs server, checklist, examples
 
+SDK reference:
+
+| Doc | SDK |
+|-----|-----|
+| [sdk-client.md](./sdk-client.md) | `@gamotech/game-sdk-client` (browser) |
+| [sdk-nodejs.md](./sdk-nodejs.md) | `@gamotech/game-sdk-nodejs` (Node server) |
+| [sdk-java.md](./sdk-java.md) | `in.oreng:game-sdk` (Java server) |
+| [sdks.md](./sdks.md) | Overview + links to all three |
+
 ## Platform flow
 
 ```

@@ -1,18 +1,10 @@
-const DEFAULT_API_BASE = "https://api.dpbossking.com/api/v1";
+import { ProviderSDKError } from "./errors.js";
 
-export class ProviderSDKError extends Error {
-  constructor(message, { status, code, data } = {}) {
-    super(message);
-    this.name = "ProviderSDKError";
-    this.status = status ?? null;
-    this.code = code ?? null;
-    this.data = data ?? null;
-  }
-}
+const DEFAULT_API_BASE = "https://api.dpbossking.com/api/v1";
 
 /**
  * Browser/client SDK — session validate + lifecycle events only.
- * Wallet operations must use ProviderGameServerSDK on your game server.
+ * Wallet operations must use @gamotech/game-sdk-nodejs on your game backend.
  */
 export class ProviderGameSDK {
   #apiBase;
@@ -200,4 +192,5 @@ export class ProviderGameSDK {
   }
 }
 
+export { ProviderSDKError };
 export default ProviderGameSDK;
