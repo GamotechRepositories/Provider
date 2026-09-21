@@ -6,6 +6,7 @@ const WALLET_BODY_FIELDS = [
   "roundId",
   "tableId",
   "gameCode",
+  "remarks",
   "reference",
   "metadata",
 ];

@@ -14,6 +14,7 @@ async function proxyToSessionService(req, res, path, method = "get") {
       headers: {
         authorization: req.headers.authorization,
         "content-type": req.headers["content-type"],
+        "x-admin-key": req.headers["x-admin-key"],
       },
       validateStatus: () => true,
     };
@@ -42,8 +43,16 @@ router.post("/sessions/events", (req, res) =>
   proxyToSessionService(req, res, "/sessions/events", "post")
 );
 
-router.get("/sessions/track", (req, res) =>
-  proxyToSessionService(req, res, "/sessions/track", "get")
+router.get("/admin/sessions", (req, res) =>
+  proxyToSessionService(req, res, "/admin/sessions", "get")
+);
+
+router.get("/admin/sessions/track", (req, res) =>
+  proxyToSessionService(req, res, "/admin/sessions/track", "get")
+);
+
+router.get("/admin/sessions/:sessionId", (req, res) =>
+  proxyToSessionService(req, res, `/admin/sessions/${req.params.sessionId}`, "get")
 );
 
 export default router;

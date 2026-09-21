@@ -21,10 +21,12 @@ Owns session lifecycle and game event tracking. Stores current session state and
 ## Flow
 
 ```
-Launch Service  →  POST /sessions           (create)
-Game            →  POST /sessions/validate  (validate)
-Game            →  POST /sessions/events    (report events)
-Admin           →  GET  /sessions/track      (audit)
+Launch Service  →  POST /sessions              (create)
+Game            →  POST /sessions/validate     (validate)
+Game            →  POST /sessions/events       (report events)
+Admin           →  GET  /admin/sessions        (list, requires X-Admin-Key)
+Admin           →  GET  /admin/sessions/track  (audit by token)
+Admin           →  GET  /admin/sessions/:id    (detail + events)
 ```
 
 ## Endpoints
@@ -34,8 +36,12 @@ Admin           →  GET  /sessions/track      (audit)
 | POST | `/api/v1/sessions` | Launch Service (internal) | Create session |
 | POST | `/api/v1/sessions/validate` | Game (via gateway) | Validate sessionToken |
 | POST | `/api/v1/sessions/events` | Game (via gateway) | Record lifecycle event |
-| GET | `/api/v1/sessions/track` | Admin (via gateway) | Load session + events |
+| GET | `/api/v1/admin/sessions` | Admin (via gateway) | List sessions (paginated) |
+| GET | `/api/v1/admin/sessions/track` | Admin (via gateway) | Load session + events by token |
+| GET | `/api/v1/admin/sessions/:sessionId` | Admin (via gateway) | Load session + events by ID |
 | GET | `/health` | — | Health check |
+
+All `/admin/*` routes require header `X-Admin-Key` matching `ADMIN_API_KEY`.
 
 ## MongoDB collections
 
@@ -129,21 +135,66 @@ session/
 ├── config/
 │   └── db.js
 ├── controllers/
-│   └── sessionController.js
+│   ├── sessionController.js
+│   └── adminSessionController.js
+├── middleware/
+│   └── adminAuth.js
 ├── models/
 │   ├── Session.js
 │   └── SessionEvent.js
 ├── routes/
-│   └── session.js
+│   ├── session.js
+│   └── adminSession.js
 └── services/
     └── sessionService.js
 ```
+
+## Admin APIs
+
+All admin routes require:
+
+```
+X-Admin-Key: <ADMIN_API_KEY>
+```
+
+### List sessions
+
+```
+GET /api/v1/admin/sessions?page=1&limit=20&operatorId=AAKDA-001&status=ACTIVE
+```
+
+Query filters: `operatorId`, `playerId`, `gameCode`, `status`, `from`, `to`, `page`, `limit` (max 100).
+
+```json
+{
+  "success": true,
+  "sessions": [{ "sessionId": "...", "sessionToken": "...", "status": "ACTIVE" }],
+  "pagination": { "page": 1, "limit": 20, "total": 42, "totalPages": 3 }
+}
+```
+
+### Track by sessionToken
+
+```
+GET /api/v1/admin/sessions/track?sessionToken=abc123
+```
+
+### Detail by sessionId
+
+```
+GET /api/v1/admin/sessions/665e1234abcd5678ef901234
+```
+
+Returns `{ success, session, events }` — same shape as track.
+
+**Errors:** `401` invalid/missing key · `503` `ADMIN_API_KEY` not configured on server
 
 ## Environment
 
 ```env
 PORT=3004
 MONGO_URI=mongodb+srv://...
+ADMIN_API_KEY=your-long-random-admin-secret
 ```
 
 ## Run locally

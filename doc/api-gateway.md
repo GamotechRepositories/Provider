@@ -31,7 +31,9 @@ API Gateway (:3000)
 | GET | `/api/v1/enabled-games?operatorId=` | Enabled Games Service `/api/v1/enabled-games` |
 | POST | `/api/v1/sessions/validate` | Session Service `/api/v1/sessions/validate` |
 | POST | `/api/v1/sessions/events` | Session Service `/api/v1/sessions/events` |
-| GET | `/api/v1/sessions/track?sessionToken=` | Session Service `/api/v1/sessions/track` |
+| GET | `/api/v1/admin/sessions` | Session Service `/api/v1/admin/sessions` (requires `X-Admin-Key`) |
+| GET | `/api/v1/admin/sessions/track?sessionToken=` | Session Service `/api/v1/admin/sessions/track` |
+| GET | `/api/v1/admin/sessions/:sessionId` | Session Service `/api/v1/admin/sessions/:sessionId` |
 | GET/POST/PUT/PATCH/DELETE | `/api/v1/integrations/*` | Operator Adapter integration CRUD |
 | GET/POST | `/api/v1/adapters/player-profile` | Operator Adapter player profile |
 | GET/POST | `/api/v1/adapters/balance` | Operator Adapter balance |
@@ -57,5 +59,6 @@ cd api && npm start
 ## Notes
 
 - Launch routes forward `X-API-Key`, `X-Timestamp`, `X-Signature` headers and raw body unchanged (required for HMAC).
-- Session routes forward `Authorization` header and body/query params.
+- Session routes forward `Authorization` header, `X-Admin-Key`, and body/query params.
+- Admin session routes require `X-Admin-Key` matching Session Service `ADMIN_API_KEY`.
 - Session creation (`POST /sessions`) is **internal only** — called by Launch Service, not exposed via gateway.

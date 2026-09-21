@@ -1,6 +1,11 @@
 import crypto from "crypto";
+import mongoose from "mongoose";
 import Session from "../models/Session.js";
 import SessionEvent from "../models/SessionEvent.js";
+
+const DEFAULT_PAGE = 1;
+const DEFAULT_LIMIT = 20;
+const MAX_LIMIT = 100;
 
 function generateSessionToken() {
   return crypto.randomBytes(32).toString("hex");
@@ -243,6 +248,85 @@ export async function getSessionTrack(sessionToken) {
   return {
     valid: true,
     session: formatInternalSession(resolved.session),
+    events: events.map(formatInternalEvent),
+  };
+}
+
+function parsePagination(page, limit) {
+  const pageNum = Math.max(DEFAULT_PAGE, parseInt(page, 10) || DEFAULT_PAGE);
+  const limitNum = Math.min(
+    MAX_LIMIT,
+    Math.max(1, parseInt(limit, 10) || DEFAULT_LIMIT)
+  );
+
+  return {
+    page: pageNum,
+    limit: limitNum,
+    skip: (pageNum - 1) * limitNum,
+  };
+}
+
+function buildSessionListQuery({
+  operatorId,
+  playerId,
+  gameCode,
+  status,
+  from,
+  to,
+}) {
+  const query = {};
+
+  if (operatorId) query.operatorId = operatorId;
+  if (playerId) query.playerId = playerId;
+  if (gameCode) query.gameCode = gameCode;
+  if (status) query.status = status;
+
+  if (from || to) {
+    query.createdAt = {};
+    if (from) query.createdAt.$gte = new Date(from);
+    if (to) query.createdAt.$lte = new Date(to);
+  }
+
+  return query;
+}
+
+export async function listSessions(filters = {}) {
+  const { page, limit, skip } = parsePagination(filters.page, filters.limit);
+  const query = buildSessionListQuery(filters);
+
+  const [sessions, total] = await Promise.all([
+    Session.find(query).sort({ createdAt: -1 }).skip(skip).limit(limit),
+    Session.countDocuments(query),
+  ]);
+
+  return {
+    valid: true,
+    sessions: sessions.map(formatInternalSession),
+    pagination: {
+      page,
+      limit,
+      total,
+      totalPages: total === 0 ? 0 : Math.ceil(total / limit),
+    },
+  };
+}
+
+export async function getSessionById(sessionId) {
+  if (!mongoose.Types.ObjectId.isValid(sessionId)) {
+    return { valid: false, status: 400, message: "Invalid sessionId" };
+  }
+
+  const session = await Session.findById(sessionId);
+
+  if (!session) {
+    return { valid: false, status: 404, message: "Session not found" };
+  }
+
+  const events = await loadEventsBySessionId(session._id);
+
+  return {
+    valid: true,
+    session: formatInternalSession(session),
     events: events.map(formatInternalEvent),
   };
 }

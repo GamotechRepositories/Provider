@@ -622,7 +622,8 @@ window.addEventListener("beforeunload", () => {
 | `POST /sessions/validate` | Game client | `sessionToken` |
 | `POST /sessions/events` | Game client | `sessionToken` |
 | `POST /sessions` | Launch Service (internal) | — |
-| `GET /sessions/track` | Admin / support | `sessionToken` |
+| `GET /admin/sessions/track` | Admin / support | `sessionToken` + `X-Admin-Key` |
+| `GET /admin/sessions` | Admin panel | `X-Admin-Key` |
 
 ---
 

@@ -100,6 +100,50 @@ Each operation can also define its own **auth**, **headers**, and **payload** so
 }
 ```
 
+**Example — operator expects `userId`, `gameId`, `remarks`**
+
+Operator debit body:
+
+```json
+{
+  "userId": "...",
+  "amount": 100,
+  "transactionId": "TXN_DEBIT_1001",
+  "gameId": "ludo-classic",
+  "roundId": "ROUND_5501",
+  "remarks": "Entry fee for Ludo Classic"
+}
+```
+
+OPA `operations.debit` config (mapping only — no literal values in `mapping`):
+
+```json
+"payload": {
+  "mapping": {
+    "playerId": "userId",
+    "amount": "amount",
+    "transactionId": "transactionId",
+    "gameCode": "gameId",
+    "roundId": "roundId",
+    "remarks": "remarks"
+  }
+}
+```
+
+Game server sends to Provider (no `userId` — comes from session as `playerId`):
+
+```json
+{
+  "sessionToken": "...",
+  "amount": 100,
+  "transactionId": "TXN_DEBIT_1001",
+  "roundId": "ROUND_5501",
+  "remarks": "Entry fee for Ludo Classic"
+}
+```
+
+`gameId` is filled from session `gameCode` via mapping (`gameCode` → `gameId`).
+
 **Payload fields**
 
 | Field | Purpose |

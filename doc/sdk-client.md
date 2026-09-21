@@ -23,7 +23,6 @@ See also: [game-sdk.md](./game-sdk.md) · [sdk-nodejs.md](./sdk-nodejs.md) · [s
 ## Install
 
 ```bash
-npm install @gamotech/game-sdk-client
 ```
 
 ---
