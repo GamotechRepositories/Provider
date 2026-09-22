@@ -43,6 +43,22 @@ router.post("/sessions/events", (req, res) =>
   proxyToSessionService(req, res, "/sessions/events", "post")
 );
 
+router.get("/admin/sessions/stats/by-operator", (req, res) =>
+  proxyToSessionService(req, res, "/admin/sessions/stats/by-operator", "get")
+);
+
+router.get("/admin/sessions/stats/by-game", (req, res) =>
+  proxyToSessionService(req, res, "/admin/sessions/stats/by-game", "get")
+);
+
+router.get("/admin/sessions/events/by-operator", (req, res) =>
+  proxyToSessionService(req, res, "/admin/sessions/events/by-operator", "get")
+);
+
+router.get("/admin/sessions/events/by-game", (req, res) =>
+  proxyToSessionService(req, res, "/admin/sessions/events/by-game", "get")
+);
+
 router.get("/admin/sessions", (req, res) =>
   proxyToSessionService(req, res, "/admin/sessions", "get")
 );

@@ -32,6 +32,10 @@ API Gateway (:3000)
 | POST | `/api/v1/sessions/validate` | Session Service `/api/v1/sessions/validate` |
 | POST | `/api/v1/sessions/events` | Session Service `/api/v1/sessions/events` |
 | GET | `/api/v1/admin/sessions` | Session Service `/api/v1/admin/sessions` (requires `X-Admin-Key`) |
+| GET | `/api/v1/admin/sessions/stats/by-operator` | Session Service win/loss stats by operator |
+| GET | `/api/v1/admin/sessions/stats/by-game` | Session Service win/loss stats by game |
+| GET | `/api/v1/admin/sessions/events/by-operator` | Session Service round results by operator |
+| GET | `/api/v1/admin/sessions/events/by-game` | Session Service round results by game |
 | GET | `/api/v1/admin/sessions/track?sessionToken=` | Session Service `/api/v1/admin/sessions/track` |
 | GET | `/api/v1/admin/sessions/:sessionId` | Session Service `/api/v1/admin/sessions/:sessionId` |
 | GET/POST/PUT/PATCH/DELETE | `/api/v1/integrations/*` | Operator Adapter integration CRUD |

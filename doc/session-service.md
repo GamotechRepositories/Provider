@@ -37,6 +37,10 @@ Admin           →  GET  /admin/sessions/:id    (detail + events)
 | POST | `/api/v1/sessions/validate` | Game (via gateway) | Validate sessionToken |
 | POST | `/api/v1/sessions/events` | Game (via gateway) | Record lifecycle event |
 | GET | `/api/v1/admin/sessions` | Admin (via gateway) | List sessions (paginated) |
+| GET | `/api/v1/admin/sessions/stats/by-operator` | Admin (via gateway) | Win/loss stats for an operator |
+| GET | `/api/v1/admin/sessions/stats/by-game` | Admin (via gateway) | Win/loss stats for a game |
+| GET | `/api/v1/admin/sessions/events/by-operator` | Admin (via gateway) | Round results for an operator |
+| GET | `/api/v1/admin/sessions/events/by-game` | Admin (via gateway) | Round results for a game |
 | GET | `/api/v1/admin/sessions/track` | Admin (via gateway) | Load session + events by token |
 | GET | `/api/v1/admin/sessions/:sessionId` | Admin (via gateway) | Load session + events by ID |
 | GET | `/health` | — | Health check |
@@ -146,7 +150,8 @@ session/
 │   ├── session.js
 │   └── adminSession.js
 └── services/
-    └── sessionService.js
+    ├── sessionService.js
+    └── sessionAnalyticsService.js
 ```
 
 ## Admin APIs
@@ -186,6 +191,98 @@ GET /api/v1/admin/sessions/665e1234abcd5678ef901234
 ```
 
 Returns `{ success, session, events }` — same shape as track.
+
+### Win/loss stats by operator
+
+Uses `ROUND_ENDED` events where games send `payload.result` (`WIN`, `LOSS`, `DRAW`).
+
+```
+GET /api/v1/admin/sessions/stats/by-operator?operatorId=AAKDA-001&gameCode=POTLUDO&from=2026-09-01&to=2026-09-22
+```
+
+```json
+{
+  "success": true,
+  "filters": { "operatorId": "AAKDA-001", "gameCode": "POTLUDO" },
+  "summary": {
+    "totalRounds": 120,
+    "wins": 55,
+    "losses": 60,
+    "draws": 3,
+    "unknown": 2,
+    "totalPayout": 15000,
+    "totalBet": 12000
+  },
+  "byPlayer": [
+    {
+      "playerId": "P1001",
+      "playerUsername": "john_doe",
+      "wins": 10,
+      "losses": 8,
+      "draws": 0,
+      "unknown": 0,
+      "totalRounds": 18,
+      "totalPayout": 2000,
+      "totalBet": 1800,
+      "netPayout": 200
+    }
+  ]
+}
+```
+
+### Win/loss stats by game
+
+```
+GET /api/v1/admin/sessions/stats/by-game?gameCode=POTLUDO&operatorId=AAKDA-001
+```
+
+Same response shape as operator stats.
+
+### Round result events by operator
+
+```
+GET /api/v1/admin/sessions/events/by-operator?operatorId=AAKDA-001&result=WIN&page=1&limit=20
+```
+
+```json
+{
+  "success": true,
+  "filters": { "operatorId": "AAKDA-001", "result": "WIN" },
+  "events": [
+    {
+      "eventId": "...",
+      "sessionId": "...",
+      "operatorId": "AAKDA-001",
+      "gameCode": "POTLUDO",
+      "playerId": "P1001",
+      "playerUsername": "john_doe",
+      "event": "ROUND_ENDED",
+      "roundId": "round_001",
+      "result": "WIN",
+      "payout": 200,
+      "betAmount": 100,
+      "createdAt": "2026-09-11T05:00:00.000Z"
+    }
+  ],
+  "pagination": { "page": 1, "limit": 20, "total": 55, "totalPages": 3 }
+}
+```
+
+### Round result events by game
+
+```
+GET /api/v1/admin/sessions/events/by-game?gameCode=POTLUDO&operatorId=AAKDA-001&result=LOSS
+```
+
+**Game must send on round end:**
+
+```json
+{
+  "event": "ROUND_ENDED",
+  "roundId": "round_001",
+  "payload": { "result": "WIN", "payout": 200, "betAmount": 100 }
+}
+```
 
 **Errors:** `401` invalid/missing key · `503` `ADMIN_API_KEY` not configured on server
 
